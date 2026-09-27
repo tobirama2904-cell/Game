@@ -1,0 +1,9 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.4",
+  "Category": "Games",
+  "Description": "After the Signal - original third-person survival story",
+  "Modules": [
+    { "Name": "AfterSignal", "Type": "Runtime", "LoadingPhase": "Default" }
+  ]
+}

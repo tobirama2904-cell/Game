@@ -1,0 +1,14 @@
+# Unreal build outputs (keep Content/ assets in version control)
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+.vs/
+*.sln
+*.VC.db
+# Legacy web build outputs
+node_modules/
+dist/
+*.apk
+*.aab
+.DS_Store
