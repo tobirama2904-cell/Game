@@ -4,6 +4,19 @@
   "Category": "Games",
   "Description": "After the Signal - original third-person survival story",
   "Modules": [
-    { "Name": "AfterSignal", "Type": "Runtime", "LoadingPhase": "Default" }
+    {
+      "Name": "AfterSignal",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "PythonScriptPlugin",
+      "Enabled": true,
+      "TargetAllowList": [
+        "Editor"
+      ]
+    }
   ]
 }

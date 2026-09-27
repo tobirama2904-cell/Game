@@ -17,6 +17,9 @@ private:
     UPROPERTY() TObjectPtr<UStaticMesh> CubeMesh;
     UPROPERTY() TObjectPtr<UStaticMesh> ConeMesh;
     UPROPERTY() TObjectPtr<UStaticMesh> CylinderMesh;
-    void Block(FVector Location, FVector Size, UStaticMesh* Mesh, bool bCollision = true);
+    UPROPERTY() TObjectPtr<UMaterialInterface> ForestMaterial;
+    UPROPERTY() TObjectPtr<UMaterialInterface> RoadMaterial;
+    UPROPERTY() TObjectPtr<UMaterialInterface> ConcreteMaterial;
+    void Block(FVector Location, FVector Size, UStaticMesh* Mesh, bool bCollision = true, UMaterialInterface* Material = nullptr);
     void BuildWorld();
 };

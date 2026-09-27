@@ -11,6 +11,7 @@
 #include "Components/DirectionalLightComponent.h"
 #include "Components/SkyLightComponent.h"
 #include "Engine/World.h"
+#include "Materials/MaterialInterface.h"
 #include "GameFramework/PlayerController.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -24,6 +25,10 @@ ASignalGameMode::ASignalGameMode()
     if (Cube.Succeeded()) CubeMesh = Cube.Object;
     if (Cone.Succeeded()) ConeMesh = Cone.Object;
     if (Cylinder.Succeeded()) CylinderMesh = Cylinder.Object;
+    // Optional editor-generated content. If not imported, fall back to engine materials.
+    ForestMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Materials/M_ForestGround.M_ForestGround"));
+    RoadMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Materials/M_RoadAsphalt.M_RoadAsphalt"));
+    ConcreteMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Materials/M_Concrete.M_Concrete"));
 }
 void ASignalGameMode::BeginPlay()
 {
@@ -34,12 +39,14 @@ void ASignalGameMode::BeginPlay()
         if (APawn* Player = GetWorld()->GetFirstPlayerController() ? GetWorld()->GetFirstPlayerController()->GetPawn() : nullptr)
             Player->SetActorLocation(FVector(0.f, 2600.f, 140.f));
 }
-void ASignalGameMode::Block(FVector Location, FVector Size, UStaticMesh* Mesh, bool bCollision)
+void ASignalGameMode::Block(FVector Location, FVector Size, UStaticMesh* Mesh, bool bCollision, UMaterialInterface* Material)
 {
     if (!Mesh || !GetWorld()) return;
     AStaticMeshActor* Piece = GetWorld()->SpawnActor<AStaticMeshActor>(Location, FRotator::ZeroRotator);
     if (!Piece) return;
+    Piece->GetStaticMeshComponent()->SetMobility(EComponentMobility::Movable);
     Piece->GetStaticMeshComponent()->SetStaticMesh(Mesh);
+    if (Material) Piece->GetStaticMeshComponent()->SetMaterial(0, Material);
     Piece->SetActorScale3D(Size / 100.f);
     Piece->GetStaticMeshComponent()->SetCollisionEnabled(bCollision ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
 }
@@ -49,8 +56,8 @@ void ASignalGameMode::BuildWorld()
     if (!World) return;
     World->SpawnActor<ADirectionalLight>(FVector(-4500.f, -4500.f, 7000.f), FRotator(-45.f, -25.f, 0.f));
     World->SpawnActor<ASkyLight>(FVector(0.f, 0.f, 700.f), FRotator::ZeroRotator);
-    Block(FVector(0.f, -4500.f, -65.f), FVector(23000.f, 26000.f, 120.f), CubeMesh);
-    Block(FVector(0.f, -4000.f, 2.f), FVector(700.f, 21000.f, 6.f), CubeMesh);
+    Block(FVector(0.f, -4500.f, -65.f), FVector(23000.f, 26000.f, 120.f), CubeMesh, true, ForestMaterial);
+    Block(FVector(0.f, -4000.f, 2.f), FVector(700.f, 21000.f, 6.f), CubeMesh, true, RoadMaterial);
     for (int32 I = 0; I < 110; ++I)
     {
         const float X = FMath::FRandRange(-10500.f, 10500.f);
@@ -62,9 +69,9 @@ void ASignalGameMode::BuildWorld()
     }
     for (const FVector& P : TArray<FVector>{ FVector(-3100.f,-2500.f,0.f), FVector(2500.f,-6400.f,0.f), FVector(-1900.f,-9000.f,0.f) })
     {
-        Block(P + FVector(0.f,0.f,22.f), FVector(1300.f,1000.f,44.f), CubeMesh);
-        Block(P + FVector(-650.f,0.f,205.f), FVector(35.f,1000.f,365.f), CubeMesh);
-        Block(P + FVector(0.f,-500.f,205.f), FVector(1300.f,35.f,365.f), CubeMesh);
+        Block(P + FVector(0.f,0.f,22.f), FVector(1300.f,1000.f,44.f), CubeMesh, true, ConcreteMaterial);
+        Block(P + FVector(-650.f,0.f,205.f), FVector(35.f,1000.f,365.f), CubeMesh, true, ConcreteMaterial);
+        Block(P + FVector(0.f,-500.f,205.f), FVector(1300.f,35.f,365.f), CubeMesh, true, ConcreteMaterial);
         Block(P + FVector(0.f,0.f,420.f), FVector(900.f,800.f,30.f), CubeMesh);
     }
     for (int32 I=0; I<4; ++I)
