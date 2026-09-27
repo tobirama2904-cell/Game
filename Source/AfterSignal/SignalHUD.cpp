@@ -20,16 +20,12 @@ void ASignalHUD::DrawHUD()
     UFont* Font = GEngine ? GEngine->GetSmallFont() : nullptr;
     if (!Font) return;
     DrawText(TEXT("AFTER THE SIGNAL  /  OREGON, 2041"), Accent, 24.f*Scale, 20.f*Scale, Font, Scale);
-    static const TCHAR* Tasks[] = {
-        TEXT("1. Find the operator's note at the radio outpost (west of road)"),
-        TEXT("2. Search the clinic east of the road for medicine"),
-        TEXT("3. Reach the relay tower and transmit the signal"),
-        TEXT("SIGNAL SENT. Explore the forest freely.")
-    };
-    DrawText(Tasks[FMath::Clamp(Player->ChapterStep,0,3)], Text, 24.f*Scale, 50.f*Scale, Font, Scale);
+    DrawText(Player->GetObjective(), Text, 24.f*Scale, 50.f*Scale, Font, Scale);
+    if (Player->ChapterStep == 3)
+        DrawText(Player->GetEndingText(), Accent, 24.f*Scale, 77.f*Scale, Font, Scale);
     const float Bottom = Canvas->SizeY - 125.f*Scale;
-    DrawText(FString::Printf(TEXT("HEALTH %d   STAMINA %d   AMMO %d / %d   BANDAGES %d   STONES %d"),
-        FMath::RoundToInt(Player->Health), FMath::RoundToInt(Player->Stamina), Player->Ammo, Player->ReserveAmmo, Player->Bandages, Player->Stones),
+    DrawText(FString::Printf(TEXT("HEALTH %d   STAMINA %d   AMMO %d / %d   BANDAGES %d   STONES %d   SUPPLIES %d"),
+        FMath::RoundToInt(Player->Health), FMath::RoundToInt(Player->Stamina), Player->Ammo, Player->ReserveAmmo, Player->Bandages, Player->Stones, Player->Supplies),
         Player->Health < 30.f ? Danger : Text, 24.f*Scale, Bottom, Font, Scale);
     DrawText(TEXT("WASD MOVE  SHIFT RUN  CTRL CROUCH  LMB FIRE  R RELOAD  H BANDAGE  Q STONE  F ETHAN WAIT/FOLLOW  E USE  F5 SAVE"),
         Text, 24.f*Scale, Bottom + 27.f*Scale, Font, Scale);

@@ -39,7 +39,7 @@ FString ASignalInteractable::GetPrompt() const
     case ESignalPickup::Supplies: return TEXT("COLLECT SUPPLIES");
     case ESignalPickup::Note: return TEXT("READ OPERATOR'S NOTE");
     case ESignalPickup::Medicine: return TEXT("TAKE MEDICINE");
-    case ESignalPickup::Tower: return TEXT("SEND RADIO SIGNAL");
+    case ESignalPickup::Tower: return TEXT("PUBLIC CALL (E) / PRIVATE CHANNEL (G)");
     }
     return TEXT("USE");
 }
@@ -50,7 +50,7 @@ void ASignalInteractable::Use(ASignalCharacter* Player)
     {
     case ESignalPickup::Ammo: Player->ReserveAmmo += 8; break;
     case ESignalPickup::Bandage: ++Player->Bandages; break;
-    case ESignalPickup::Supplies: ++Player->Bandages; break;
+    case ESignalPickup::Supplies: ++Player->Supplies; break;
     case ESignalPickup::Note: if (Player->ChapterStep != 0) return; Player->AdvanceStory(); break;
     case ESignalPickup::Medicine: if (!Player->CollectMedicine()) return; break;
     case ESignalPickup::Tower: if (Player->ChapterStep != 2) return; Player->SendSignal(); break;

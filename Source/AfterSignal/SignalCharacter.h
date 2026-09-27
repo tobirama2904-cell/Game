@@ -34,6 +34,9 @@ public:
     UPROPERTY(BlueprintReadOnly, Category="Story") int32 ChapterStep = 0;
     UPROPERTY(BlueprintReadOnly, Category="Story") bool bMedicineCollected = false;
     UPROPERTY(BlueprintReadOnly, Category="Story") bool bSignalSent = false;
+    // 0 = undecided, 1 = public distress call, 2 = private frequency.
+    UPROPERTY(BlueprintReadOnly, Category="Story") int32 BroadcastChoice = 0;
+    UPROPERTY(BlueprintReadOnly, Category="Survival") int32 Supplies = 0;
     UPROPERTY(BlueprintAssignable, Category="Story") FOnSignalStoryChanged OnStoryChanged;
     UFUNCTION(BlueprintPure, Category="Survival") bool IsCrouchedForStealth() const { return bStealthCrouch; }
     UFUNCTION(BlueprintPure, Category="Survival") bool IsAlive() const { return Health > 0.f; }
@@ -46,6 +49,10 @@ public:
     UFUNCTION(BlueprintPure, Category="Story") bool IsStoryLineVisible() const;
     void AdvanceStory();
     void SendSignal();
+    void ChoosePrivateSignal();
+    void CompleteBroadcast(int32 Choice);
+    UFUNCTION(BlueprintPure, Category="Story") FString GetObjective() const;
+    UFUNCTION(BlueprintPure, Category="Story") FString GetEndingText() const;
 protected:
     UPROPERTY(VisibleAnywhere) TObjectPtr<USpringArmComponent> SpringArm;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UCameraComponent> FollowCamera;
@@ -62,9 +69,11 @@ protected:
     void Interact();
     void ThrowStone();
     void ToggleCompanionWait();
+    void PrivateSignalInput();
     bool bSprinting = false;
     bool bStealthCrouch = false;
     float LastShotTime = -10.f;
+    float FootstepNoiseTimer = 0.f;
     FTimerHandle ReloadTimer;
     TArray<int32> CollectedPickups;
     UPROPERTY() TObjectPtr<ASignalCompanion> Companion;

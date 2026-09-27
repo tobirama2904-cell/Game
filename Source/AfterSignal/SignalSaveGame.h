@@ -11,10 +11,12 @@ public:
     UPROPERTY() int32 ChapterStep = 0;
     UPROPERTY() bool bMedicineCollected = false;
     UPROPERTY() bool bSignalSent = false;
+    UPROPERTY() int32 BroadcastChoice = 0;
     UPROPERTY() float Health = 100.f;
     UPROPERTY() int32 Ammo = 6;
     UPROPERTY() int32 ReserveAmmo = 18;
     UPROPERTY() int32 Bandages = 2;
+    UPROPERTY() int32 Supplies = 0;
     UPROPERTY() bool bBleeding = false;
     UPROPERTY() bool bLegInjured = false;
     UPROPERTY() int32 Stones = 3;

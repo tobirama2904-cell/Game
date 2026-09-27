@@ -47,7 +47,18 @@ void ASignalCompanion::ReceiveDamage(float Amount)
 void ASignalCompanion::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    if (!IsAlive() || bWaiting || !IsValid(Leader) || !Leader->IsAlive()) return;
+    if (!IsAlive() || !IsValid(Leader) || !Leader->IsAlive()) return;
+    const float DistanceToLeader = FVector::Dist2D(GetActorLocation(), Leader->GetActorLocation());
+    if (EmergencyBandages > 0 && Leader->bBleeding && DistanceToLeader < 230.f &&
+        GetWorld() && GetWorld()->GetTimeSeconds() >= NextAidTime)
+    {
+        --EmergencyBandages;
+        Leader->bBleeding = false;
+        Leader->Health = FMath::Min(100.f, Leader->Health + 20.f);
+        NextAidTime = GetWorld()->GetTimeSeconds() + 90.f;
+        Leader->SaveProgress();
+    }
+    if (bWaiting) return;
     // Desired place is behind and to the side; crouch is mirrored and emits no noise.
     const FVector Forward = Leader->GetActorForwardVector();
     const FVector Side = FVector::CrossProduct(FVector::UpVector, Forward);

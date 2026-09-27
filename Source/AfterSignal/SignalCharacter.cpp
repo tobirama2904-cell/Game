@@ -51,6 +51,16 @@ void ASignalCharacter::BeginPlay() { Super::BeginPlay(); LoadProgress(); LastSto
 void ASignalCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    if (IsAlive() && !bStealthCrouch && GetVelocity().SizeSquared2D() > 10000.f && GetWorld())
+    {
+        FootstepNoiseTimer -= DeltaTime;
+        if (FootstepNoiseTimer <= 0.f)
+        {
+            ASignalEnemy::BroadcastNoise(GetWorld(), GetActorLocation(), bSprinting ? 780.f : 370.f);
+            FootstepNoiseTimer = bSprinting ? .44f : .75f;
+        }
+    }
+    else FootstepNoiseTimer = 0.f;
     if (bBleeding && Health > 0.f)
     {
         Health = FMath::Max(0.f, Health - 2.5f * DeltaTime);
@@ -77,6 +87,7 @@ void ASignalCharacter::SetupPlayerInputComponent(UInputComponent* Input)
     Input->BindAction("Save", IE_Pressed, this, &ASignalCharacter::SaveProgress);
     Input->BindAction("Distract", IE_Pressed, this, &ASignalCharacter::ThrowStone);
     Input->BindAction("CompanionWait", IE_Pressed, this, &ASignalCharacter::ToggleCompanionWait);
+    Input->BindAction("PrivateSignal", IE_Pressed, this, &ASignalCharacter::PrivateSignalInput);
 }
 void ASignalCharacter::MoveForward(float Value)
 {
@@ -161,7 +172,44 @@ void ASignalCharacter::Interact()
 }
 void ASignalCharacter::AdvanceStory() { if (ChapterStep == 0) { ChapterStep = 1; LastStoryChangeTime = GetWorld()->GetTimeSeconds(); OnStoryChanged.Broadcast(); } }
 bool ASignalCharacter::CollectMedicine() { if (ChapterStep != 1) return false; bMedicineCollected = true; ChapterStep = 2; LastStoryChangeTime = GetWorld()->GetTimeSeconds(); OnStoryChanged.Broadcast(); return true; }
-void ASignalCharacter::SendSignal() { if (ChapterStep == 2 && bMedicineCollected) { bSignalSent = true; ChapterStep = 3; LastStoryChangeTime = GetWorld()->GetTimeSeconds(); OnStoryChanged.Broadcast(); } }
+void ASignalCharacter::SendSignal() { CompleteBroadcast(1); }
+void ASignalCharacter::ChoosePrivateSignal() { CompleteBroadcast(2); }
+void ASignalCharacter::PrivateSignalInput()
+{
+    // Choice needs physical proximity to the transmitter, just like E interaction.
+    if (ChapterStep != 2 || !bMedicineCollected ||
+        FVector::DistSquared2D(GetActorLocation(), FVector(0.f,-11600.f,0.f)) > FMath::Square(300.f)) return;
+    ChoosePrivateSignal();
+    MarkPickupCollected(2); // Same radio item as the public broadcast.
+    for (TActorIterator<ASignalInteractable> It(GetWorld()); It; ++It)
+        if (It->PickupId == 2) { It->Destroy(); break; }
+    SaveProgress();
+}
+void ASignalCharacter::CompleteBroadcast(int32 Choice)
+{
+    if (ChapterStep != 2 || !bMedicineCollected || (Choice != 1 && Choice != 2)) return;
+    BroadcastChoice = Choice;
+    bSignalSent = true;
+    ChapterStep = 3;
+    LastStoryChangeTime = GetWorld()->GetTimeSeconds();
+    OnStoryChanged.Broadcast();
+}
+FString ASignalCharacter::GetObjective() const
+{
+    switch (ChapterStep)
+    {
+    case 0: return TEXT("Find the operator's note at the radio outpost (west of road)");
+    case 1: return TEXT("Search the clinic east of the road for medicine");
+    case 2: return TEXT("Reach the relay tower: E public call / G private channel");
+    default: return TEXT("Transmission complete. Explore the forest freely.");
+    }
+}
+FString ASignalCharacter::GetEndingText() const
+{
+    if (BroadcastChoice == 1) return TEXT("PUBLIC CALL: Black Point answers. Others can hear the coordinates too.");
+    if (BroadcastChoice == 2) return TEXT("PRIVATE CHANNEL: Black Point answers. Strangers remain in the dark.");
+    return TEXT("The relay waits for a decision.");
+}
 
 void ASignalCharacter::MarkPickupCollected(int32 PickupId)
 {
@@ -175,6 +223,8 @@ void ASignalCharacter::SaveProgress()
     Save->ChapterStep = ChapterStep;
     Save->bMedicineCollected = bMedicineCollected;
     Save->bSignalSent = bSignalSent;
+    Save->BroadcastChoice = BroadcastChoice;
+    Save->Supplies = Supplies;
     Save->Health = Health;
     Save->Ammo = Ammo;
     Save->ReserveAmmo = ReserveAmmo;
@@ -194,6 +244,8 @@ void ASignalCharacter::LoadProgress()
     ChapterStep = FMath::Clamp(Save->ChapterStep, 0, 3);
     bMedicineCollected = Save->bMedicineCollected;
     bSignalSent = Save->bSignalSent;
+    BroadcastChoice = FMath::Clamp(Save->BroadcastChoice, 0, 2);
+    Supplies = FMath::Max(0, Save->Supplies);
     Health = FMath::Clamp(Save->Health, 1.f, 100.f);
     Ammo = FMath::Clamp(Save->Ammo, 0, 6);
     ReserveAmmo = FMath::Max(0, Save->ReserveAmmo);
@@ -223,7 +275,7 @@ FString ASignalCharacter::GetStoryLine() const
     case 0: return TEXT("ETHAN: Do you think anyone is still listening?  MARA: Then let's give them something to hear.");
     case 1: return TEXT("MARA: The operator left medicine in the clinic. Ethan, stay close. I'm coming back.");
     case 2: return TEXT("ETHAN: You found it?  MARA: We still have to get the transmitter working.");
-    default: return TEXT("MARA: If you hear me, we're still here.  RADIO: Black Point. We see your light.");
+    default: return GetEndingText();
     }
 }
 bool ASignalCharacter::IsStoryLineVisible() const

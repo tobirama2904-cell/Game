@@ -31,12 +31,20 @@ void ASignalEnemy::BeginPlay()
     Super::BeginPlay(); Home = GetActorLocation(); Interest = Home;
     WanderPhase = FMath::FRandRange(0.f, 6.28f);
 }
-void ASignalEnemy::HearNoise(const FVector& Position) { Interest = Position; Memory = 5.f; bAlerted = true; }
+void ASignalEnemy::HearNoise(const FVector& Position)
+{
+    if (Health <= 0.f) return;
+    // Hearing gives a last-known position, never omniscient tracking.
+    Interest = Position;
+    Memory = 6.f;
+    bAlerted = true;
+}
 void ASignalEnemy::BroadcastNoise(UWorld* World, const FVector& Position, float Radius)
 {
     if (!World) return;
     for (TActorIterator<ASignalEnemy> It(World); It; ++It)
-        if ((*It)->Health > 0.f && FVector::DistSquared2D((*It)->GetActorLocation(), Position) < FMath::Square(Radius)) (*It)->HearNoise(Position);
+        if ((*It)->Health > 0.f && FVector::DistSquared2D((*It)->GetActorLocation(), Position) < FMath::Square(Radius))
+            (*It)->HearNoise(Position);
 }
 void ASignalEnemy::ReceiveShot(float Damage)
 {
@@ -49,7 +57,22 @@ void ASignalEnemy::ReceiveShot(float Damage)
         GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         SetLifeSpan(40.f);
     }
-    else if (ASignalCharacter* Player = Cast<ASignalCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0))) HearNoise(Player->GetActorLocation());
+    else if (ASignalCharacter* Player = Cast<ASignalCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0)))
+        HearNoise(Player->GetActorLocation());
+}
+bool ASignalEnemy::CanSeePlayer(const ASignalCharacter* Player, float Distance) const
+{
+    if (!Player || !GetWorld()) return false;
+    const float Radius = Player->IsCrouchedForStealth() ? 500.f : 1050.f;
+    if (Distance > Radius) return false;
+    const FVector Direction = (Player->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+    // Close targets can be noticed from any side, distant targets need to be in view.
+    if (Distance > 240.f && FVector::DotProduct(GetActorForwardVector(), Direction) < .3f) return false;
+    FHitResult Hit;
+    FCollisionQueryParams Query(SCENE_QUERY_STAT(SignalEnemySight), false, this);
+    const FVector Eyes = GetActorLocation() + FVector(0.f, 0.f, 65.f);
+    const FVector Target = Player->GetActorLocation() + FVector(0.f, 0.f, 60.f);
+    return GetWorld()->LineTraceSingleByChannel(Hit, Eyes, Target, ECC_Visibility, Query) && Hit.GetActor() == Player;
 }
 void ASignalEnemy::Tick(float DeltaTime)
 {
@@ -58,11 +81,15 @@ void ASignalEnemy::Tick(float DeltaTime)
     ASignalCharacter* Player = Cast<ASignalCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
     if (!Player || !Player->IsAlive()) return;
     const float Distance = FVector::Dist2D(GetActorLocation(), Player->GetActorLocation());
-    const float DetectRadius = Player->IsCrouchedForStealth() ? 520.f : Player->IsSprinting() ? 1600.f : 950.f;
-    if (Distance < DetectRadius) HearNoise(Player->GetActorLocation());
-    Memory = FMath::Max(0.f, Memory - DeltaTime);
-    if (Memory <= 0.f) { bAlerted = false; Interest = Home + FVector(FMath::Sin(GetWorld()->GetTimeSeconds()*.25f + WanderPhase)*260.f, FMath::Cos(GetWorld()->GetTimeSeconds()*.25f + WanderPhase)*260.f, 0.f); }
-    else if (Distance < DetectRadius * 1.3f) Interest = Player->GetActorLocation();
+    const bool bVisible = CanSeePlayer(Player, Distance);
+    if (bVisible) HearNoise(Player->GetActorLocation());
+    else Memory = FMath::Max(0.f, Memory - DeltaTime);
+    if (Memory <= 0.f)
+    {
+        bAlerted = false;
+        Interest = Home + FVector(FMath::Sin(GetWorld()->GetTimeSeconds()*.25f + WanderPhase)*260.f,
+                                  FMath::Cos(GetWorld()->GetTimeSeconds()*.25f + WanderPhase)*260.f, 0.f);
+    }
     const FVector Offset = Interest - GetActorLocation();
     if (Offset.SizeSquared2D() > FMath::Square(110.f))
     {
@@ -71,8 +98,12 @@ void ASignalEnemy::Tick(float DeltaTime)
         FHitResult Hit;
         SetActorLocation(GetActorLocation() + Direction * Speed * DeltaTime, true, &Hit);
         SetActorRotation(Direction.Rotation());
+        // Collision stops direct movement; this is not full pathfinding.
     }
-    GetCharacterMovement()->MaxWalkSpeed = bAlerted ? (bRunner ? 420.f : 290.f) : 110.f;
     AttackCooldown = FMath::Max(0.f, AttackCooldown - DeltaTime);
-    if (Distance < 145.f && AttackCooldown <= 0.f) { Player->TakeSurvivalDamage(bRunner ? 18.f : 12.f); AttackCooldown = 1.25f; }
+    if (bVisible && Distance < 145.f && AttackCooldown <= 0.f)
+    {
+        Player->TakeSurvivalDamage(bRunner ? 18.f : 12.f);
+        AttackCooldown = 1.25f;
+    }
 }

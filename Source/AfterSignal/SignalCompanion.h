@@ -22,9 +22,11 @@ public:
     UFUNCTION(BlueprintPure, Category="Companion") bool IsAlive() const { return Health > 0.f; }
     UFUNCTION(BlueprintCallable, Category="Companion") void ReceiveDamage(float Amount);
     UPROPERTY(BlueprintReadOnly, Category="Companion") float Health = 100.f;
+    UPROPERTY(BlueprintReadOnly, Category="Companion") int32 EmergencyBandages = 1;
 private:
     UPROPERTY() TObjectPtr<ASignalCharacter> Leader;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> Body;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> Head;
     bool bWaiting = false;
+    float NextAidTime = 0.f;
 };

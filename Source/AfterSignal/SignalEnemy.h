@@ -23,6 +23,7 @@ public:
     UPROPERTY(BlueprintReadOnly, Category="Enemy") float Health = 90.f;
     UPROPERTY(BlueprintReadOnly, Category="Enemy") bool bAlerted = false;
 private:
+    bool CanSeePlayer(const ASignalCharacter* Player, float Distance) const;
     FVector Home;
     FVector Interest;
     float Memory = 0.f;

@@ -41,3 +41,7 @@ The three locally authored maps in `Content/SourceTextures/` are **source JPEG f
 ## Companion milestone (source only)
 
 `ASignalCompanion` now spawns Ethan near Mara, follows from behind/side, mirrors crouching, and supports `F` wait/follow. It avoids broadcasting noise, and teleports to a floor-tested position if separated too far; it does **not** have navigation around buildings, combat aid, spoken lines or a finished skeletal model. This code must be compiled and playtested in UE5 before being called functional on a device.
+
+## Detection, companion aid and tower choice (source, not runtime verified)
+
+Enemy sight now requires range, a forward view cone and a visibility line trace; noise from shots, stones and moving footsteps instead gives a timed last-known location. Ethan can spend **one** emergency bandage on a nearby bleeding Mara (no repeated free healing). At the relay, `E` sends an open distress call or `G` uses a private channel; the decision and its short ending text are saved. This is a **small choice at the end of one short episode**, not the promised branching AAA campaign. `python3 scripts/test-story-contracts.py` checks that input, save fields and stage gates are wired consistently, but cannot verify UE compilation, behavior, rendering or Android performance.
