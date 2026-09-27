@@ -1,5 +1,6 @@
 #include "SignalHUD.h"
 #include "SignalCharacter.h"
+#include "SignalCompanion.h"
 #include "SignalInteractable.h"
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
@@ -30,7 +31,7 @@ void ASignalHUD::DrawHUD()
     DrawText(FString::Printf(TEXT("HEALTH %d   STAMINA %d   AMMO %d / %d   BANDAGES %d   STONES %d"),
         FMath::RoundToInt(Player->Health), FMath::RoundToInt(Player->Stamina), Player->Ammo, Player->ReserveAmmo, Player->Bandages, Player->Stones),
         Player->Health < 30.f ? Danger : Text, 24.f*Scale, Bottom, Font, Scale);
-    DrawText(TEXT("WASD MOVE  SHIFT RUN  CTRL CROUCH  LMB FIRE  R RELOAD  H BANDAGE  Q DISTRACT  E USE  F5 SAVE"),
+    DrawText(TEXT("WASD MOVE  SHIFT RUN  CTRL CROUCH  LMB FIRE  R RELOAD  H BANDAGE  Q STONE  F ETHAN WAIT/FOLLOW  E USE  F5 SAVE"),
         Text, 24.f*Scale, Bottom + 27.f*Scale, Font, Scale);
     if (Player->bBleeding || Player->bLegInjured)
         DrawText(Player->bBleeding ? TEXT("BLEEDING - USE A BANDAGE [H]") : TEXT("LEG INJURED - MOVEMENT SLOWED"),

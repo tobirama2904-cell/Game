@@ -1,5 +1,6 @@
 #include "SignalGameMode.h"
 #include "SignalCharacter.h"
+#include "SignalCompanion.h"
 #include "SignalHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "SignalEnemy.h"
@@ -35,9 +36,15 @@ void ASignalGameMode::BeginPlay()
     Super::BeginPlay();
     BuildWorld();
     // Entry is an engine map: no authored .umap is required to start this prototype.
-    if (!UGameplayStatics::DoesSaveGameExist(TEXT("AfterSignal"), 0))
-        if (APawn* Player = GetWorld()->GetFirstPlayerController() ? GetWorld()->GetFirstPlayerController()->GetPawn() : nullptr)
+    ASignalCharacter* Player = Cast<ASignalCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+    if (Player)
+    {
+        if (!UGameplayStatics::DoesSaveGameExist(TEXT("AfterSignal"), 0))
             Player->SetActorLocation(FVector(0.f, 2600.f, 140.f));
+        if (ASignalCompanion* Ethan = GetWorld()->SpawnActor<ASignalCompanion>(
+            Player->GetActorLocation() + FVector(160.f, 140.f, 10.f), FRotator::ZeroRotator))
+            Player->SetCompanion(Ethan);
+    }
 }
 void ASignalGameMode::Block(FVector Location, FVector Size, UStaticMesh* Mesh, bool bCollision, UMaterialInterface* Material)
 {

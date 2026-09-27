@@ -37,3 +37,7 @@ Recent source work adds bleeding, leg injury, bandage treatment, stone distracti
 ## Textures actually used by the UE world
 
 The three locally authored maps in `Content/SourceTextures/` are **source JPEG files**, not Unreal `.uasset` files. In a UE 5.4 editor with Python Editor Script Plugin, run `UnrealEditor AfterSignal.uproject -unattended -ExecutePythonScript=scripts/import_materials.py`. The script imports textures, creates and saves `/Game/Materials/M_ForestGround`, `M_RoadAsphalt`, `M_Concrete`, and sets UV tiling. The C++ world loads those material assets at startup and applies them to terrain/road/ruins; if they have not been imported, the scene falls back to default UE materials. These files do not change placeholder characters into scanned or photorealistic assets. `python3 scripts/check-project.py` checks paths/JSON/source structure **offline only**; it does not compile UE.
+
+## Companion milestone (source only)
+
+`ASignalCompanion` now spawns Ethan near Mara, follows from behind/side, mirrors crouching, and supports `F` wait/follow. It avoids broadcasting noise, and teleports to a floor-tested position if separated too far; it does **not** have navigation around buildings, combat aid, spoken lines or a finished skeletal model. This code must be compiled and playtested in UE5 before being called functional on a device.

@@ -8,6 +8,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class USkeletalMeshComponent;
 class UStaticMeshComponent;
+class ASignalCompanion;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSignalStoryChanged);
 
@@ -40,6 +41,7 @@ public:
     UFUNCTION(BlueprintCallable, Category="Save") void SaveProgress();
     UFUNCTION(BlueprintCallable, Category="Save") void LoadProgress();
     void MarkPickupCollected(int32 PickupId);
+    void SetCompanion(ASignalCompanion* NewCompanion);
     UFUNCTION(BlueprintPure, Category="Story") FString GetStoryLine() const;
     UFUNCTION(BlueprintPure, Category="Story") bool IsStoryLineVisible() const;
     void AdvanceStory();
@@ -59,10 +61,12 @@ protected:
     void Heal();
     void Interact();
     void ThrowStone();
+    void ToggleCompanionWait();
     bool bSprinting = false;
     bool bStealthCrouch = false;
     float LastShotTime = -10.f;
     FTimerHandle ReloadTimer;
     TArray<int32> CollectedPickups;
+    UPROPERTY() TObjectPtr<ASignalCompanion> Companion;
     float LastStoryChangeTime = -100.f;
 };

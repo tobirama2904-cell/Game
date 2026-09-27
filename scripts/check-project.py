@@ -17,7 +17,7 @@ for name in maps:
     assert f'/Game/Materials/M_{name}.M_{name}' in world, name
     assert f"'{name}', 'M_{name}'" in importer, name
 for name in ['SignalGameMode', 'SignalCharacter', 'SignalEnemy', 'SignalHUD',
-             'SignalInteractable', 'SignalSaveGame']:
+             'SignalInteractable', 'SignalSaveGame', 'SignalCompanion']:
     for suffix in ('.h', '.cpp'):
         path = root / f'Source/AfterSignal/{name}{suffix}'
         assert path.exists(), path

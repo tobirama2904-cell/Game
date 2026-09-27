@@ -1,5 +1,6 @@
 #include "SignalCharacter.h"
 #include "SignalEnemy.h"
+#include "SignalCompanion.h"
 #include "SignalInteractable.h"
 #include "SignalSaveGame.h"
 #include "Kismet/GameplayStatics.h"
@@ -75,6 +76,7 @@ void ASignalCharacter::SetupPlayerInputComponent(UInputComponent* Input)
     Input->BindAction("Interact", IE_Pressed, this, &ASignalCharacter::Interact);
     Input->BindAction("Save", IE_Pressed, this, &ASignalCharacter::SaveProgress);
     Input->BindAction("Distract", IE_Pressed, this, &ASignalCharacter::ThrowStone);
+    Input->BindAction("CompanionWait", IE_Pressed, this, &ASignalCharacter::ToggleCompanionWait);
 }
 void ASignalCharacter::MoveForward(float Value)
 {
@@ -227,4 +229,14 @@ FString ASignalCharacter::GetStoryLine() const
 bool ASignalCharacter::IsStoryLineVisible() const
 {
     return GetWorld() && GetWorld()->GetTimeSeconds() - LastStoryChangeTime < (ChapterStep == 3 ? 18.f : 11.f);
+}
+
+void ASignalCharacter::SetCompanion(ASignalCompanion* NewCompanion)
+{
+    Companion = NewCompanion;
+    if (IsValid(Companion)) Companion->SetLeader(this);
+}
+void ASignalCharacter::ToggleCompanionWait()
+{
+    if (IsValid(Companion)) Companion->ToggleWait();
 }
