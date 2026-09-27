@@ -1,8 +1,9 @@
 import * as THREE from 'three';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import './style.css';
 
 const app=document.querySelector('#app');
-app.innerHTML=`<div id="game"></div><div id="vignette"></div><div id="grain"></div><div id="hud"><div class="top"><div class="brand">ПОСЛЕ СИГНАЛА<small>AFTER THE SIGNAL · 01</small></div><div class="topright"><div class="chip" id="weather">☁ ТУМАН · 06:42</div><div class="chip" id="status">СОХРАНЕНО</div></div></div><div class="chapter"><div class="eyebrow" id="chapter">ГЛАВА I / ПОСЛЕДНИЙ ЭФИР</div><h2 id="objective-title">Найти радиостанцию</h2><p id="objective">Следуй по старой дороге на запад. У башни должен быть работающий передатчик.</p></div><div class="meters"><div class="meter-label"><span>ЗДОРОВЬЕ</span><span id="hp-number">100</span></div><div class="meter health"><span id="hp-bar" style="width:100%"></span></div><div class="meter-label"><span>ВЫНОСЛИВОСТЬ</span><span id="st-number">100</span></div><div class="meter"><span id="st-bar" style="width:100%"></span></div><div class="inventory"><div class="slot">ПАТРОНЫ<b id="ammo">6 / 18</b></div><div class="slot">БИНТЫ<b id="bandages">2</b></div><div class="slot">ПРИПАСЫ<b id="supplies">0</b></div></div></div><div class="crosshair"></div><div class="subtitle" id="subtitle"></div><div class="prompt" id="prompt" style="display:none"></div><div class="toast" id="toast"></div></div><div id="touch"><div id="stick"><div id="knob"></div></div><div id="actions"><button class="action" data-key="c">ТИХО</button><button class="action" data-key="e">ВЗЯТЬ</button><button class="action" data-key="h">БИНТ</button><button class="action big" data-key="fire">ОГОНЬ</button></div><div class="mobile-top"><button class="action" data-key="r">ПЕРЕЗ.</button><button class="action" data-key="run">БЕГ</button><button class="action" data-key="m">КАРТА</button></div></div><div id="fade"></div><div id="letter"><div class="paper"><h3 id="letter-title"></h3><div id="letter-text"></div><button id="close-letter">ЗАКРЫТЬ · E</button></div></div><div class="menu" id="menu"><div class="menu-inner"><div class="overline">ОРИГИНАЛЬНАЯ ИСТОРИЯ О ТОМ, ЧТО ОСТАЁТСЯ</div><h1>ПОСЛЕ<br><em>СИГНАЛА</em></h1><div class="en">AFTER THE SIGNAL</div><div class="divider"></div><p>В штате Орегон погасли маяки. Бывший техник связи Мара Рид и её младший брат Итан ищут источник последнего радиосигнала. За лесом кто-то ещё зовёт на помощь.</p><button id="start" class="primary">НАЧАТЬ ИСТОРИЮ →</button><p class="hint">WASD — движение · Мышь — обзор · ЛКМ — выстрел · Shift — бег · C — присесть · E — взаимодействие · R — перезарядка · H — лечение · M — карта<br>На телефоне: левый джойстик, свайп справа и экранные кнопки. Наушники рекомендуются.</p></div></div>`;
+app.innerHTML=`<div id="game"></div><div id="vignette"></div><div id="grain"></div><div id="hud"><div class="top"><div class="brand">ПОСЛЕ СИГНАЛА<small>AFTER THE SIGNAL · 01</small></div><div class="topright"><div class="chip" id="weather">☁ ТУМАН · 06:42</div><div class="chip" id="status">СОХРАНЕНО</div></div></div><div class="chapter"><div class="eyebrow" id="chapter">ГЛАВА I / ПОСЛЕДНИЙ ЭФИР</div><h2 id="objective-title">Найти радиостанцию</h2><p id="objective">Исследуй станцию слева от дороги и найди запись оператора.</p></div><div class="meters"><div class="meter-label"><span>ЗДОРОВЬЕ</span><span id="hp-number">100</span></div><div class="meter health"><span id="hp-bar" style="width:100%"></span></div><div class="meter-label"><span>ВЫНОСЛИВОСТЬ</span><span id="st-number">100</span></div><div class="meter"><span id="st-bar" style="width:100%"></span></div><div class="inventory"><div class="slot">ПАТРОНЫ<b id="ammo">6 / 18</b></div><div class="slot">БИНТЫ<b id="bandages">2</b></div><div class="slot">ПРИПАСЫ<b id="supplies">0</b></div></div></div><div class="crosshair"></div><div class="subtitle" id="subtitle"></div><div class="prompt" id="prompt" style="display:none"></div><div class="toast" id="toast"></div></div><div id="touch"><div id="stick"><div id="knob"></div></div><div id="actions"><button class="action" data-key="c">ТИХО</button><button class="action" data-key="e">ВЗЯТЬ</button><button class="action" data-key="h">БИНТ</button><button class="action big" data-key="fire">ОГОНЬ</button></div><div class="mobile-top"><button class="action" data-key="r">ПЕРЕЗ.</button><button class="action" data-key="run">БЕГ</button><button class="action" data-key="m">КАРТА</button></div></div><div id="fade"></div><div id="letter"><div class="paper"><h3 id="letter-title"></h3><div id="letter-text"></div><button id="close-letter">ЗАКРЫТЬ · E</button></div></div><div class="menu" id="menu"><div class="menu-inner"><div class="overline">ОРИГИНАЛЬНАЯ ИСТОРИЯ О ТОМ, ЧТО ОСТАЁТСЯ</div><h1>ПОСЛЕ<br><em>СИГНАЛА</em></h1><div class="en">AFTER THE SIGNAL</div><div class="divider"></div><p>В штате Орегон погасли маяки. Бывший техник связи Мара Рид и её младший брат Итан ищут источник последнего радиосигнала. За лесом кто-то ещё зовёт на помощь.</p><button id="start" class="primary">НАЧАТЬ ИСТОРИЮ →</button><p class="hint">WASD — движение · Мышь — обзор · ЛКМ — выстрел · Shift — бег · C — присесть · E — взаимодействие · R — перезарядка · H — лечение · M — карта<br>На телефоне: левый джойстик, свайп справа и экранные кнопки. Наушники рекомендуются.</p></div></div>`;
 const $=id=>document.getElementById(id), clamp=THREE.MathUtils.clamp;
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9da79b);scene.fog=new THREE.FogExp2(0x9da79b,.017);
 const camera=new THREE.PerspectiveCamera(67,innerWidth/innerHeight,.1,330);
@@ -10,6 +11,13 @@ const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-per
 scene.add(new THREE.HemisphereLight(0xb8cbca,0x344332,2.5));const sun=new THREE.DirectionalLight(0xffd5a0,3.3);sun.position.set(-45,70,-75);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;sun.shadow.bias=-.0004;scene.add(sun);
 const mat=(c,rough=1,metal=0)=>new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:metal});
 const M={ground:mat(0x556651),road:mat(0x66635b),bark:mat(0x403e32),pine:mat(0x304d3c),pine2:mat(0x49614b),grass:mat(0x758068),concrete:mat(0x777a70),wall:mat(0x86877b),roof:mat(0x383f3c),rust:mat(0x8d5b42),yellow:mat(0xc6a15e),red:mat(0x9b614e),glass:mat(0x6d938f,.15,.3),dark:mat(0x252e2b),skin:mat(0xb99177),coat:mat(0x455a54),denim:mat(0x384955),infected:mat(0x747f69),light:new THREE.MeshStandardMaterial({color:0xffcd73,emissive:0xffb659,emissiveIntensity:2})};
+// Locally authored material maps; no runtime network dependency.
+const textureLoader=new THREE.TextureLoader();
+function surface(file,repeatX,repeatY){const t=textureLoader.load('/'+file);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeatX,repeatY);t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());return t}
+M.ground.map=surface('forest-ground.jpg',42,50);M.ground.color.set(0xffffff);M.ground.needsUpdate=true;
+M.road.map=surface('road-asphalt.jpg',1,33);M.road.color.set(0xffffff);M.road.needsUpdate=true;
+M.wall.map=surface('concrete.jpg',1,1);M.wall.color.set(0xc0c6bf);M.wall.needsUpdate=true;
+M.concrete.map=surface('concrete.jpg',1,1);M.concrete.color.set(0xb1b5ac);M.concrete.needsUpdate=true;
 const cubeGeo=new THREE.BoxGeometry(1,1,1), cylGeo=new THREE.CylinderGeometry(1,1,1,8), sphereGeo=new THREE.SphereGeometry(1,10,8);
 function box(parent,x,y,z,w,h,d,m,shadow=true){let o=new THREE.Mesh(cubeGeo,m);o.position.set(x,y,z);o.scale.set(w,h,d);o.castShadow=shadow;o.receiveShadow=true;parent.add(o);return o}
 function cylinder(parent,x,y,z,rt,rb,h,m){let o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,7),m);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
@@ -21,7 +29,23 @@ for(let i=0;i<95;i++){let z=between(-138,62),x=between(-2.5,2.5);box(scene,x,.05
 const forest=[];for(let i=0;i<410;i++){let x=between(-108,108),z=between(-160,80);if(Math.abs(x)<9||Math.hypot(x+30,z+25)<15||Math.hypot(x-25,z+64)<17||Math.hypot(x,z+114)<18)continue;forest.push([x,z,between(.65,1.45)])}
 const dummy=new THREE.Object3D();function instanced(geo,material,count,fn){let mesh=new THREE.InstancedMesh(geo,material,count);mesh.castShadow=count<500;mesh.receiveShadow=count<500;for(let i=0;i<count;i++){let [x,y,z,sx,sy,sz]=fn(i);dummy.position.set(x,y,z);dummy.scale.set(sx,sy,sz);dummy.rotation.set(0,0,0);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix)}mesh.instanceMatrix.needsUpdate=true;scene.add(mesh);return mesh}
 instanced(new THREE.CylinderGeometry(.23,.32,4,6),M.bark,forest.length,i=>{let [x,z,s]=forest[i];return[x,2*s,z,s,s,s]});
-for(let j=0;j<3;j++)instanced(new THREE.ConeGeometry(1.5-j*.24,3.5-j*.2,7),j%2?M.pine:M.pine2,forest.length,i=>{let[x,z,s]=forest[i];return[x,(3.8+j*1.15)*s,z,s,s,s]});
+function pineCrown(){
+  const shapes=[];const branch=new THREE.ConeGeometry(.46,1.65,6);
+  for(let tier=0;tier<6;tier++){
+    const h=2.65+tier*.72, radius=(1.7-tier*.19);
+    for(let n=0;n<7;n++){
+      const angle=(n+tier*.43)*Math.PI*2/7;
+      const cone=branch.clone();
+      const t=new THREE.Object3D();t.position.set(Math.cos(angle)*radius*.47,h,Math.sin(angle)*radius*.47);
+      t.rotation.set(Math.sin(angle)*.55,0,-Math.cos(angle)*.55);
+      t.scale.set(radius*.9,1.4-tier*.045, radius*.9);t.updateMatrix();cone.applyMatrix4(t.matrix);shapes.push(cone)
+    }
+  }
+  const tip=new THREE.ConeGeometry(.55,1.6,7);tip.translate(0,6.9,0);shapes.push(tip);
+  let merged=mergeGeometries(shapes);shapes.forEach(v=>v.dispose());branch.dispose();return merged
+}
+const crown=pineCrown();
+instanced(crown,M.pine,forest.length,i=>{let[x,z,s]=forest[i];return[x,0,z,s,s,s]});
 const grasses=[];for(let i=0;i<600;i++){let x=between(-105,105),z=between(-154,75);if(Math.abs(x)<4)continue;grasses.push([x,z,between(.35,.95),between(.1,.3)])}
 instanced(new THREE.ConeGeometry(1,1,3),M.grass,grasses.length,i=>{let[x,z,h,r]=grasses[i];return[x,h*.5,z,r,h,r]});
 function ruin(x,z,w,d,rot=0){let g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rot;scene.add(g);box(g,0,.15,0,w,.3,d,M.concrete);let h=between(2.6,4);box(g,-w/2,h/2,0,.35,h,d,M.wall);box(g,w/2,h/2,-d*.27,.35,h,d*.46,M.wall);box(g,w/2,h/2,d*.33,.35,h,d*.35,M.wall);box(g,0,h/2,-d/2,w,h,.35,M.wall);box(g,-w*.2,h-.2,0,w*.62,.3,d*.73,M.roof);for(let j=0;j<4;j++)box(g,between(-w*.35,w*.35),.3,between(-d*.32,d*.32),between(.4,1.3),between(.3,.7),between(.4,.9),j%2?M.rust:M.concrete);return g}
@@ -31,7 +55,34 @@ for(let i=0;i<35;i++){let x=between(-65,65),z=between(-130,43);if(Math.abs(x)<5)
 const tower=new THREE.Group();tower.position.set(0,0,-116);scene.add(tower);for(let i=0;i<4;i++){let a=i*Math.PI/2;cylinder(tower,Math.cos(a)*3,12,Math.sin(a)*3,.13,.26,24,M.rust)}for(let y=4;y<23;y+=4){box(tower,0,y,0,6.2,.12,.18,M.rust);box(tower,0,y,0,.18,.12,6.2,M.rust)}cylinder(tower,0,25,0,.12,.12,8,M.concrete);ball(tower,0,29,0,.4,.4,.4,M.light);
 for(let i=0;i<26;i++){let z=-133+i*8;for(let side of [-1,1]){let x=side*4.7;box(scene,x,1.5,z,.17,3,.17,M.bark);if(i%3===0)box(scene,x,2.8,z,.45,.28,.35,M.yellow)}}
 function car(x,z,rotation=0){let g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rotation;scene.add(g);box(g,0,.75,0,2.25,.85,4.5,M.rust);box(g,0,1.45,-.35,1.88,.7,2.6,M.dark);box(g,0,1.5,-1.68,1.72,.53,.08,M.glass);for(let a of [-1,1])for(let b of [-1,1]){let w=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.15,12),M.dark);w.rotation.z=Math.PI/2;w.position.set(a*1.15,.43,b*1.4);g.add(w)}return g}car(1.5,-36,.25);car(-1.8,-93,-.3);
-function human(coat,infected=false){let g=new THREE.Group();let torso=box(g,0,1.17,0,.68,.91,.39,coat);let head=ball(g,0,1.94,-.03,.28,.3,.27,infected?M.infected:M.skin);box(g,0,2.14,-.06,.58,.17,.54,infected?M.pine:M.dark);let legs=[];for(let x of [-.19,.19]){let leg=box(g,x,.45,0,.25,.87,.26,M.denim);legs.push(leg)}let arms=[];for(let x of [-.46,.46]){let arm=box(g,x,1.19,.02,.2,.77,.24,coat);arms.push(arm)}return{g,legs,arms,head,torso}}
+function human(coat,infected=false){
+  // Distinct silhouette: neck, shoulders, jacket, backpack, jointed limbs and boots.
+  let g=new THREE.Group();let trousers=infected?M.rust:M.denim;
+  let torso=new THREE.Mesh(new THREE.CylinderGeometry(.28,.35,.92,10),coat);torso.position.y=1.29;torso.castShadow=true;g.add(torso);
+  let hips=ball(g,0,.85,0,.34,.23,.21,trousers);
+  let neck=cylinder(g,0,1.83,0,.11,.11,.19,infected?M.infected:M.skin);
+  let head=ball(g,0,2.06,-.035,.225,.29,.22,infected?M.infected:M.skin);
+  let jaw=ball(g,0,1.92,.13,.15,.09,.11,infected?M.infected:M.skin);
+  let hair=ball(g,0,2.29,-.07,.235,.095,.23,infected?M.bark:M.dark);
+  let ear=ball(g,-.225,2.04,0,.055,.09,.07,infected?M.infected:M.skin);
+  ball(g,.225,2.04,0,.055,.09,.07,infected?M.infected:M.skin);
+  // Face points toward local +Z, the same direction as the navigation yaw.
+  for(let side of [-1,1]){ball(g,side*.095,2.09,.169,.025,.018,.012,M.dark)}
+  ball(g,0,1.99,.195,.05,.055,.055,infected?M.infected:M.skin);
+  let bag=box(g,0,1.3,-.32,.54,.78,.23,infected?M.bark:M.rust);box(g,0,1.25,-.46,.34,.24,.065,M.dark);
+  const legs=[];for(let side of [-1,1]){
+    let thigh=new THREE.Group();thigh.position.set(side*.18,.82,0);g.add(thigh);
+    let pant=new THREE.Mesh(new THREE.CylinderGeometry(.125,.108,.68,8),trousers);pant.position.y=-.35;pant.castShadow=true;thigh.add(pant);
+    box(thigh,0,-.71,.095,.26,.18,.43,M.dark);legs.push(thigh);
+  }
+  const arms=[];for(let side of [-1,1]){
+    let arm=new THREE.Group();arm.position.set(side*.37,1.64,0);g.add(arm);
+    let sleeve=new THREE.Mesh(new THREE.CylinderGeometry(.145,.1,.63,8),coat);sleeve.position.set(side*.06,-.3,0);sleeve.rotation.z=side*.13;sleeve.castShadow=true;arm.add(sleeve);
+    ball(arm,side*.1,-.66,0,.105,.12,.09,infected?M.infected:M.skin);arms.push(arm);
+  }
+  if(!infected){box(g,0,1.15,.29,.11,.72,.065,M.dark);box(g,-.13,1.47,.3,.09,.27,.08,M.dark)}
+  return{g,legs,arms,head,torso}
+}
 const pmodel=human(M.coat);scene.add(pmodel.g);const companion=human(M.yellow);scene.add(companion.g);companion.g.scale.setScalar(.89);
 const enemies=[];function spawnEnemy(x,z,type='drifter'){let model=human(type==='runner'?M.rust:M.infected,true);model.g.position.set(x,0,z);scene.add(model.g);enemies.push({model,x,z,hp:type==='runner'?55:85,type,state:'idle',target:null,lastSeen:0,attack:0,phase:rand()*8,home:{x,z},alive:true});}
 for(let [x,z,t] of [[-9,-5,'drifter'],[9,-15,'drifter'],[-25,-15,'runner'],[-20,-38,'drifter'],[-38,-30,'drifter'],[12,-45,'runner'],[28,-48,'drifter'],[18,-75,'runner'],[-9,-83,'drifter'],[-23,-103,'drifter'],[13,-100,'runner'],[-8,-120,'runner'],[8,-124,'drifter']])spawnEnemy(x,z,t);
