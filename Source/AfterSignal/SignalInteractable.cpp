@@ -19,9 +19,33 @@ ASignalInteractable::ASignalInteractable()
     if (Cube.Succeeded()) Mesh->SetStaticMesh(Cube.Object);
     Mesh->SetRelativeScale3D(FVector(.35f, .35f, .3f));
 }
+bool ASignalInteractable::CanUse(const ASignalCharacter* Player) const
+{
+    if (!Player) return false;
+    switch (Kind)
+    {
+    case ESignalPickup::Note: return Player->ChapterStep == 0;
+    case ESignalPickup::Medicine: return Player->ChapterStep == 1;
+    case ESignalPickup::Tower: return Player->ChapterStep == 2;
+    default: return true;
+    }
+}
+FString ASignalInteractable::GetPrompt() const
+{
+    switch (Kind)
+    {
+    case ESignalPickup::Ammo: return TEXT("COLLECT AMMO");
+    case ESignalPickup::Bandage: return TEXT("COLLECT BANDAGE");
+    case ESignalPickup::Supplies: return TEXT("COLLECT SUPPLIES");
+    case ESignalPickup::Note: return TEXT("READ OPERATOR'S NOTE");
+    case ESignalPickup::Medicine: return TEXT("TAKE MEDICINE");
+    case ESignalPickup::Tower: return TEXT("SEND RADIO SIGNAL");
+    }
+    return TEXT("USE");
+}
 void ASignalInteractable::Use(ASignalCharacter* Player)
 {
-    if (!Player) return;
+    if (!CanUse(Player)) return;
     switch (Kind)
     {
     case ESignalPickup::Ammo: Player->ReserveAmmo += 8; break;
@@ -31,5 +55,7 @@ void ASignalInteractable::Use(ASignalCharacter* Player)
     case ESignalPickup::Medicine: if (!Player->CollectMedicine()) return; break;
     case ESignalPickup::Tower: if (Player->ChapterStep != 2) return; Player->SendSignal(); break;
     }
+    if (PickupId >= 0) Player->MarkPickupCollected(PickupId);
+    Player->SaveProgress();
     Destroy();
 }

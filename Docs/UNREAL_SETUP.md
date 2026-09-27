@@ -25,3 +25,7 @@ The project currently uses **engine primitives as placeholders**. High-end visua
 2. Replace temporary capsule/mesh characters with properly licensed skeletal meshes and animation blueprints; import a cohesive vegetation/building kit and PBR materials.
 3. Set up a distinct mobile scalability profile, landscape touch controls and HUD, and package ARM64 APK; measure FPS/memory/temperature on POCO F4.
 4. Only publish an APK to GitHub Releases once it actually exists and is install-tested. Keep binary build outputs out of Git.
+
+## Recent source additions (still not compiled in Unreal)
+
+The UE5 branch now includes a `Canvas` HUD with objectives, health/stamina/ammunition and an interaction prompt; short **text-only** story lines; and a `USaveGame` slot for chapter, location, inventory and collected pickups (F5 manual save; item pickup auto-save). These are code-level features, not voice acting or cinematics. To capture real Unreal screenshots, launch this project in UE 5.4 and use the editor's viewport screenshot or `HighResShot 1920x1080` during play. Never label screenshots from the legacy web build as Unreal screenshots.

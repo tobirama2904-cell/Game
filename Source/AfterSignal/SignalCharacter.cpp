@@ -1,6 +1,9 @@
 #include "SignalCharacter.h"
 #include "SignalEnemy.h"
 #include "SignalInteractable.h"
+#include "SignalSaveGame.h"
+#include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -43,7 +46,7 @@ ASignalCharacter::ASignalCharacter()
     PlaceholderHead->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     if (Sphere.Succeeded()) PlaceholderHead->SetStaticMesh(Sphere.Object);
 }
-void ASignalCharacter::BeginPlay() { Super::BeginPlay(); }
+void ASignalCharacter::BeginPlay() { Super::BeginPlay(); LoadProgress(); LastStoryChangeTime = GetWorld()->GetTimeSeconds(); }
 void ASignalCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
@@ -65,6 +68,7 @@ void ASignalCharacter::SetupPlayerInputComponent(UInputComponent* Input)
     Input->BindAction("Reload", IE_Pressed, this, &ASignalCharacter::Reload);
     Input->BindAction("Heal", IE_Pressed, this, &ASignalCharacter::Heal);
     Input->BindAction("Interact", IE_Pressed, this, &ASignalCharacter::Interact);
+    Input->BindAction("Save", IE_Pressed, this, &ASignalCharacter::SaveProgress);
 }
 void ASignalCharacter::MoveForward(float Value)
 {
@@ -110,13 +114,78 @@ void ASignalCharacter::Interact()
     ASignalInteractable* Closest = nullptr;
     float Best = 230.f * 230.f;
     for (const FOverlapResult& Result : Hits)
+    {
         if (ASignalInteractable* Item = Cast<ASignalInteractable>(Result.GetActor()))
         {
+            if (!Item->CanUse(this)) continue;
             const float Distance = FVector::DistSquared(GetActorLocation(), Item->GetActorLocation());
             if (Distance < Best) { Best = Distance; Closest = Item; }
         }
+    }
     if (Closest) Closest->Use(this);
 }
-void ASignalCharacter::AdvanceStory() { if (ChapterStep == 0) { ChapterStep = 1; OnStoryChanged.Broadcast(); } }
-bool ASignalCharacter::CollectMedicine() { if (ChapterStep != 1) return false; bMedicineCollected = true; ChapterStep = 2; OnStoryChanged.Broadcast(); return true; }
-void ASignalCharacter::SendSignal() { if (ChapterStep == 2 && bMedicineCollected) { bSignalSent = true; ChapterStep = 3; OnStoryChanged.Broadcast(); } }
+void ASignalCharacter::AdvanceStory() { if (ChapterStep == 0) { ChapterStep = 1; LastStoryChangeTime = GetWorld()->GetTimeSeconds(); OnStoryChanged.Broadcast(); } }
+bool ASignalCharacter::CollectMedicine() { if (ChapterStep != 1) return false; bMedicineCollected = true; ChapterStep = 2; LastStoryChangeTime = GetWorld()->GetTimeSeconds(); OnStoryChanged.Broadcast(); return true; }
+void ASignalCharacter::SendSignal() { if (ChapterStep == 2 && bMedicineCollected) { bSignalSent = true; ChapterStep = 3; LastStoryChangeTime = GetWorld()->GetTimeSeconds(); OnStoryChanged.Broadcast(); } }
+
+void ASignalCharacter::MarkPickupCollected(int32 PickupId)
+{
+    CollectedPickups.AddUnique(PickupId);
+}
+void ASignalCharacter::SaveProgress()
+{
+    if (!GetWorld() || !IsAlive()) return;
+    USignalSaveGame* Save = Cast<USignalSaveGame>(UGameplayStatics::CreateSaveGameObject(USignalSaveGame::StaticClass()));
+    if (!Save) return;
+    Save->ChapterStep = ChapterStep;
+    Save->bMedicineCollected = bMedicineCollected;
+    Save->bSignalSent = bSignalSent;
+    Save->Health = Health;
+    Save->Ammo = Ammo;
+    Save->ReserveAmmo = ReserveAmmo;
+    Save->Bandages = Bandages;
+    Save->Position = GetActorLocation();
+    Save->CollectedPickups = CollectedPickups;
+    UGameplayStatics::SaveGameToSlot(Save, TEXT("AfterSignal"), 0);
+}
+void ASignalCharacter::LoadProgress()
+{
+    if (!GetWorld() || !UGameplayStatics::DoesSaveGameExist(TEXT("AfterSignal"), 0)) return;
+    USignalSaveGame* Save = Cast<USignalSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("AfterSignal"), 0));
+    if (!Save) return;
+    ChapterStep = FMath::Clamp(Save->ChapterStep, 0, 3);
+    bMedicineCollected = Save->bMedicineCollected;
+    bSignalSent = Save->bSignalSent;
+    Health = FMath::Clamp(Save->Health, 1.f, 100.f);
+    Ammo = FMath::Clamp(Save->Ammo, 0, 6);
+    ReserveAmmo = FMath::Max(0, Save->ReserveAmmo);
+    Bandages = FMath::Max(0, Save->Bandages);
+    CollectedPickups = Save->CollectedPickups;
+    SetActorLocation(Save->Position, false, nullptr, ETeleportType::TeleportPhysics);
+    // GameMode spawns the world at BeginPlay; defer removal until spawned items exist.
+    FTimerHandle RemoveHandle;
+    GetWorldTimerManager().SetTimer(RemoveHandle, [this]()
+    {
+        if (!IsValid(this)) return;
+        TArray<ASignalInteractable*> ToRemove;
+        for (TActorIterator<ASignalInteractable> It(GetWorld()); It; ++It)
+            if (CollectedPickups.Contains(It->PickupId)) ToRemove.Add(*It);
+        for (ASignalInteractable* Item : ToRemove) if (IsValid(Item)) Item->Destroy();
+    }, .1f, false);
+    OnStoryChanged.Broadcast();
+}
+
+FString ASignalCharacter::GetStoryLine() const
+{
+    switch (ChapterStep)
+    {
+    case 0: return TEXT("ETHAN: Do you think anyone is still listening?  MARA: Then let's give them something to hear.");
+    case 1: return TEXT("MARA: The operator left medicine in the clinic. Ethan, stay close. I'm coming back.");
+    case 2: return TEXT("ETHAN: You found it?  MARA: We still have to get the transmitter working.");
+    default: return TEXT("MARA: If you hear me, we're still here.  RADIO: Black Point. We see your light.");
+    }
+}
+bool ASignalCharacter::IsStoryLineVisible() const
+{
+    return GetWorld() && GetWorld()->GetTimeSeconds() - LastStoryChangeTime < (ChapterStep == 3 ? 18.f : 11.f);
+}

@@ -1,5 +1,7 @@
 #include "SignalGameMode.h"
 #include "SignalCharacter.h"
+#include "SignalHUD.h"
+#include "Kismet/GameplayStatics.h"
 #include "SignalEnemy.h"
 #include "SignalInteractable.h"
 #include "Components/StaticMeshComponent.h"
@@ -15,6 +17,7 @@
 ASignalGameMode::ASignalGameMode()
 {
     DefaultPawnClass = ASignalCharacter::StaticClass();
+    HUDClass = ASignalHUD::StaticClass();
     static ConstructorHelpers::FObjectFinder<UStaticMesh> Cube(TEXT("/Engine/BasicShapes/Cube.Cube"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> Cone(TEXT("/Engine/BasicShapes/Cone.Cone"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> Cylinder(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
@@ -27,8 +30,9 @@ void ASignalGameMode::BeginPlay()
     Super::BeginPlay();
     BuildWorld();
     // Entry is an engine map: no authored .umap is required to start this prototype.
-    if (APawn* Player = GetWorld()->GetFirstPlayerController() ? GetWorld()->GetFirstPlayerController()->GetPawn() : nullptr)
-        Player->SetActorLocation(FVector(0.f, 2600.f, 140.f));
+    if (!UGameplayStatics::DoesSaveGameExist(TEXT("AfterSignal"), 0))
+        if (APawn* Player = GetWorld()->GetFirstPlayerController() ? GetWorld()->GetFirstPlayerController()->GetPawn() : nullptr)
+            Player->SetActorLocation(FVector(0.f, 2600.f, 140.f));
 }
 void ASignalGameMode::Block(FVector Location, FVector Size, UStaticMesh* Mesh, bool bCollision)
 {
@@ -78,8 +82,9 @@ void ASignalGameMode::BuildWorld()
         {FVector(-3400.f,-1900.f,95.f), ESignalPickup::Bandage},
         {FVector(-1800.f,-9000.f,95.f), ESignalPickup::Supplies}
     };
-    for (const FPickup& P : Pickups)
-        if (ASignalInteractable* Item = World->SpawnActor<ASignalInteractable>(P.Position, FRotator::ZeroRotator)) Item->Kind = P.Kind;
+    for (int32 I = 0; I < static_cast<int32>(UE_ARRAY_COUNT(Pickups)); ++I)
+        if (ASignalInteractable* Item = World->SpawnActor<ASignalInteractable>(Pickups[I].Position, FRotator::ZeroRotator))
+        { Item->Kind = Pickups[I].Kind; Item->PickupId = I; }
     const FVector EnemyPositions[] = {FVector(-900.f,-500.f,140.f),FVector(900.f,-1500.f,140.f),FVector(-2600.f,-3200.f,140.f),FVector(1200.f,-4500.f,140.f),FVector(2800.f,-4800.f,140.f),FVector(-900.f,-8300.f,140.f),FVector(800.f,-10600.f,140.f)};
     for (int32 I=0; I<static_cast<int32>(UE_ARRAY_COUNT(EnemyPositions)); ++I)
         if (ASignalEnemy* Enemy = World->SpawnActor<ASignalEnemy>(EnemyPositions[I], FRotator::ZeroRotator)) Enemy->bRunner = I%3 == 0;

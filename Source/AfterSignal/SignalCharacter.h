@@ -34,6 +34,11 @@ public:
     UFUNCTION(BlueprintPure, Category="Survival") bool IsCrouchedForStealth() const { return bStealthCrouch; }
     UFUNCTION(BlueprintPure, Category="Survival") bool IsAlive() const { return Health > 0.f; }
     UFUNCTION(BlueprintPure, Category="Survival") bool IsSprinting() const { return bSprinting; }
+    UFUNCTION(BlueprintCallable, Category="Save") void SaveProgress();
+    UFUNCTION(BlueprintCallable, Category="Save") void LoadProgress();
+    void MarkPickupCollected(int32 PickupId);
+    UFUNCTION(BlueprintPure, Category="Story") FString GetStoryLine() const;
+    UFUNCTION(BlueprintPure, Category="Story") bool IsStoryLineVisible() const;
     void AdvanceStory();
     void SendSignal();
 protected:
@@ -54,4 +59,6 @@ protected:
     bool bStealthCrouch = false;
     float LastShotTime = -10.f;
     FTimerHandle ReloadTimer;
+    TArray<int32> CollectedPickups;
+    float LastStoryChangeTime = -100.f;
 };
