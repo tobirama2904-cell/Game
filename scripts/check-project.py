@@ -24,4 +24,8 @@ for name in ['SignalGameMode', 'SignalCharacter', 'SignalEnemy', 'SignalHUD',
         if suffix == '.cpp':
             text = path.read_text()
             assert text.count('{') == text.count('}'), path
+settings = (root / 'Config/DefaultEngine.ini').read_text()
+assert 'GameDefaultMap=/Game/Maps/RelayRoad' in settings
+assert 'EditorStartupMap=/Game/Maps/RelayRoad' in settings
+assert (root / 'scripts/create_level.py').exists()
 print('Structural checks passed. Unreal compilation and Android packaging NOT tested.')
