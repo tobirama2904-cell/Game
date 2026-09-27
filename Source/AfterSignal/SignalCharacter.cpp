@@ -50,9 +50,14 @@ void ASignalCharacter::BeginPlay() { Super::BeginPlay(); LoadProgress(); LastSto
 void ASignalCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    if (bBleeding && Health > 0.f)
+    {
+        Health = FMath::Max(0.f, Health - 2.5f * DeltaTime);
+        if (Health <= 0.f) GetCharacterMovement()->DisableMovement();
+    }
     const bool bRunning = bSprinting && Stamina > 1.f && !bStealthCrouch && GetVelocity().SizeSquared2D() > 100.f;
     Stamina = FMath::Clamp(Stamina + (bRunning ? -24.f : 14.f) * DeltaTime, 0.f, 100.f);
-    GetCharacterMovement()->MaxWalkSpeed = bStealthCrouch ? 160.f : (bRunning ? 570.f : 340.f);
+    GetCharacterMovement()->MaxWalkSpeed = bStealthCrouch ? 160.f : (bLegInjured ? 190.f : (bRunning ? 570.f : 340.f));
 }
 void ASignalCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 {
@@ -69,6 +74,7 @@ void ASignalCharacter::SetupPlayerInputComponent(UInputComponent* Input)
     Input->BindAction("Heal", IE_Pressed, this, &ASignalCharacter::Heal);
     Input->BindAction("Interact", IE_Pressed, this, &ASignalCharacter::Interact);
     Input->BindAction("Save", IE_Pressed, this, &ASignalCharacter::SaveProgress);
+    Input->BindAction("Distract", IE_Pressed, this, &ASignalCharacter::ThrowStone);
 }
 void ASignalCharacter::MoveForward(float Value)
 {
@@ -81,7 +87,26 @@ void ASignalCharacter::MoveRight(float Value)
 void ASignalCharacter::StartSprint() { bSprinting = true; }
 void ASignalCharacter::StopSprint() { bSprinting = false; }
 void ASignalCharacter::ToggleCrouch() { bStealthCrouch = !bStealthCrouch; if (bStealthCrouch) Crouch(); else UnCrouch(); }
-void ASignalCharacter::TakeSurvivalDamage(float Amount) { Health = FMath::Clamp(Health - Amount, 0.f, 100.f); if (Health <= 0.f) GetCharacterMovement()->DisableMovement(); }
+void ASignalCharacter::TakeSurvivalDamage(float Amount)
+{
+    if (!IsAlive()) return;
+    Health = FMath::Clamp(Health - Amount, 0.f, 100.f);
+    // Repeat injuries have lasting consequences until treated.
+    if (Amount >= 12.f) bBleeding = true;
+    if (Amount >= 18.f) bLegInjured = true;
+    if (!IsAlive()) GetCharacterMovement()->DisableMovement();
+}
+void ASignalCharacter::ThrowStone()
+{
+    if (!GetWorld() || Stones <= 0 || !IsAlive()) return;
+    --Stones;
+    const FVector Start = FollowCamera->GetComponentLocation();
+    const FVector End = Start + FollowCamera->GetForwardVector() * 1800.f;
+    FHitResult Hit;
+    FCollisionQueryParams Query(SCENE_QUERY_STAT(SignalThrownStone), true, this);
+    const FVector NoisePosition = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Query) ? Hit.ImpactPoint : End;
+    ASignalEnemy::BroadcastNoise(GetWorld(), NoisePosition, 900.f);
+}
 void ASignalCharacter::Fire()
 {
     if (Ammo < 1 || !GetWorld() || GetWorld()->GetTimerManager().IsTimerActive(ReloadTimer) || GetWorld()->GetTimeSeconds() - LastShotTime < .35f || !IsAlive()) return;
@@ -103,7 +128,15 @@ void ASignalCharacter::Reload()
         Ammo += Count; ReserveAmmo -= Count;
     }, 1.3f, false);
 }
-void ASignalCharacter::Heal() { if (Bandages && Health < 100.f && IsAlive()) { --Bandages; Health = FMath::Min(100.f, Health + 45.f); } }
+void ASignalCharacter::Heal()
+{
+    if (Bandages <= 0 || !IsAlive() || (Health >= 100.f && !bBleeding && !bLegInjured)) return;
+    --Bandages;
+    Health = FMath::Min(100.f, Health + 45.f);
+    bBleeding = false;
+    bLegInjured = false;
+    SaveProgress();
+}
 void ASignalCharacter::Interact()
 {
     if (!GetWorld()) return;
@@ -144,6 +177,9 @@ void ASignalCharacter::SaveProgress()
     Save->Ammo = Ammo;
     Save->ReserveAmmo = ReserveAmmo;
     Save->Bandages = Bandages;
+    Save->bBleeding = bBleeding;
+    Save->bLegInjured = bLegInjured;
+    Save->Stones = Stones;
     Save->Position = GetActorLocation();
     Save->CollectedPickups = CollectedPickups;
     UGameplayStatics::SaveGameToSlot(Save, TEXT("AfterSignal"), 0);
@@ -160,6 +196,9 @@ void ASignalCharacter::LoadProgress()
     Ammo = FMath::Clamp(Save->Ammo, 0, 6);
     ReserveAmmo = FMath::Max(0, Save->ReserveAmmo);
     Bandages = FMath::Max(0, Save->Bandages);
+    bBleeding = Save->bBleeding;
+    bLegInjured = Save->bLegInjured;
+    Stones = FMath::Max(0, Save->Stones);
     CollectedPickups = Save->CollectedPickups;
     SetActorLocation(Save->Position, false, nullptr, ETeleportType::TeleportPhysics);
     // GameMode spawns the world at BeginPlay; defer removal until spawned items exist.

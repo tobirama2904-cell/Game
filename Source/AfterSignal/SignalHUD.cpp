@@ -27,11 +27,14 @@ void ASignalHUD::DrawHUD()
     };
     DrawText(Tasks[FMath::Clamp(Player->ChapterStep,0,3)], Text, 24.f*Scale, 50.f*Scale, Font, Scale);
     const float Bottom = Canvas->SizeY - 125.f*Scale;
-    DrawText(FString::Printf(TEXT("HEALTH %d   STAMINA %d   AMMO %d / %d   BANDAGES %d"),
-        FMath::RoundToInt(Player->Health), FMath::RoundToInt(Player->Stamina), Player->Ammo, Player->ReserveAmmo, Player->Bandages),
+    DrawText(FString::Printf(TEXT("HEALTH %d   STAMINA %d   AMMO %d / %d   BANDAGES %d   STONES %d"),
+        FMath::RoundToInt(Player->Health), FMath::RoundToInt(Player->Stamina), Player->Ammo, Player->ReserveAmmo, Player->Bandages, Player->Stones),
         Player->Health < 30.f ? Danger : Text, 24.f*Scale, Bottom, Font, Scale);
-    DrawText(TEXT("WASD MOVE  SHIFT RUN  CTRL CROUCH  LMB FIRE  R RELOAD  H HEAL  E USE  F5 SAVE"),
+    DrawText(TEXT("WASD MOVE  SHIFT RUN  CTRL CROUCH  LMB FIRE  R RELOAD  H BANDAGE  Q DISTRACT  E USE  F5 SAVE"),
         Text, 24.f*Scale, Bottom + 27.f*Scale, Font, Scale);
+    if (Player->bBleeding || Player->bLegInjured)
+        DrawText(Player->bBleeding ? TEXT("BLEEDING - USE A BANDAGE [H]") : TEXT("LEG INJURED - MOVEMENT SLOWED"),
+            Danger, 24.f*Scale, Bottom - 28.f*Scale, Font, Scale);
     DrawText(TEXT("+"), Text, Canvas->SizeX*.5f-4.f*Scale, Canvas->SizeY*.5f-9.f*Scale, Font, Scale);
     if (Player->IsStoryLineVisible())
         DrawText(Player->GetStoryLine(), Accent, 24.f*Scale, Canvas->SizeY*.79f, Font, Scale);

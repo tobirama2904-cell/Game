@@ -12,3 +12,5 @@ dist/
 *.apk
 *.aab
 .DS_Store
+
+BuildOutput/

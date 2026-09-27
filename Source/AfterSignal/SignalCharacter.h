@@ -24,6 +24,9 @@ public:
     UFUNCTION(BlueprintCallable, Category="Survival") bool CollectMedicine();
     UPROPERTY(BlueprintReadOnly, Category="Survival") float Health = 100.f;
     UPROPERTY(BlueprintReadOnly, Category="Survival") float Stamina = 100.f;
+    UPROPERTY(BlueprintReadOnly, Category="Survival") bool bBleeding = false;
+    UPROPERTY(BlueprintReadOnly, Category="Survival") bool bLegInjured = false;
+    UPROPERTY(BlueprintReadOnly, Category="Survival") int32 Stones = 3;
     UPROPERTY(BlueprintReadOnly, Category="Survival") int32 Ammo = 6;
     UPROPERTY(BlueprintReadOnly, Category="Survival") int32 ReserveAmmo = 18;
     UPROPERTY(BlueprintReadOnly, Category="Survival") int32 Bandages = 2;
@@ -55,6 +58,7 @@ protected:
     void Reload();
     void Heal();
     void Interact();
+    void ThrowStone();
     bool bSprinting = false;
     bool bStealthCrouch = false;
     float LastShotTime = -10.f;

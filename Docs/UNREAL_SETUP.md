@@ -29,3 +29,7 @@ The project currently uses **engine primitives as placeholders**. High-end visua
 ## Recent source additions (still not compiled in Unreal)
 
 The UE5 branch now includes a `Canvas` HUD with objectives, health/stamina/ammunition and an interaction prompt; short **text-only** story lines; and a `USaveGame` slot for chapter, location, inventory and collected pickups (F5 manual save; item pickup auto-save). These are code-level features, not voice acting or cinematics. To capture real Unreal screenshots, launch this project in UE 5.4 and use the editor's viewport screenshot or `HighResShot 1920x1080` during play. Never label screenshots from the legacy web build as Unreal screenshots.
+
+## Additional code and build entry point
+
+Recent source work adds bleeding, leg injury, bandage treatment, stone distraction (`Q`), on-screen injury status, and saved injury/stone counts. A synopsis and sample scene beats are in [STORY.md](STORY.md), but most of those scenes are **not** in the game. On a Linux host with a licensed UE 5.4 installation and matching Android SDK/NDK/JDK, `UE_ROOT=/path/to/UnrealEngine ANDROID_HOME=/path/to/sdk JAVA_HOME=/path/to/jdk scripts/package-android.sh` invokes the real Unreal `BuildCookRun` and rejects an empty/missing APK. This command cannot run in the current sandbox because the prerequisites are absent. Desktop and Android builds must both be tested before publishing screenshots or APKs.

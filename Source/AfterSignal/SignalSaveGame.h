@@ -15,6 +15,9 @@ public:
     UPROPERTY() int32 Ammo = 6;
     UPROPERTY() int32 ReserveAmmo = 18;
     UPROPERTY() int32 Bandages = 2;
+    UPROPERTY() bool bBleeding = false;
+    UPROPERTY() bool bLegInjured = false;
+    UPROPERTY() int32 Stones = 3;
     UPROPERTY() FVector Position = FVector(0.f, 2600.f, 140.f);
     UPROPERTY() TArray<int32> CollectedPickups;
 };
