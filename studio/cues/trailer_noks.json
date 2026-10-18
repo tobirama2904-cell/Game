@@ -1,0 +1,31 @@
+{
+  "id": "trailer_noks",
+  "grade": "noks",
+  "music": "noks",
+  "shots": [
+    {"kind": "img", "img": "noks_1.png", "zoom": [1.02, 1.22], "pan": [0, 60], "pad_in": 1.4, "pad_out": 1.1, "vo": ["noks_01.mp3"], "xfade": "fadeblack"},
+    {"kind": "img", "img": "noks_4.png", "zoom": [1.10, 1.02], "pan": [-320, 0], "pad_in": 0.7, "pad_out": 0.9, "vo": ["noks_02.mp3"], "xfade": "fade"},
+    {"kind": "img", "img": "noks_3.png", "zoom": [1.04, 1.26], "pan": [60, 40], "pad_in": 0.8, "pad_out": 1.0, "vo": ["noks_03.mp3"], "xfade": "dissolve"},
+    {"kind": "img", "img": "noks_2.png", "zoom": [1.0, 1.30], "pan": [0, 0], "pad_in": 0.7, "pad_out": 0.9, "vo": ["noks_04.mp3"], "xfade": "fade"},
+    {"kind": "img", "img": "noks_5.png", "zoom": [1.02, 1.38], "pan": [120, -60], "shake": 36, "pad_in": 0.6, "pad_out": 1.2, "vo": ["noks_05.mp3"], "xfade": "fadewhite"},
+    {"kind": "card", "card": "noks_tag.png", "dur": 3.1, "xfade": "fadeblack"},
+    {"kind": "card", "card": "noks_title.png", "dur": 4.2, "xfade": "fade"},
+    {"kind": "card", "card": "end_noks.png", "dur": 3.4, "xfade": "fadeblack"}
+  ],
+  "sfx": [
+    {"at": 0.0, "fn": "sub_drop", "kw": {"dur": 3.0, "f0": 100, "f1": 30}, "gain": 0.8},
+    {"at": "shot1+0.0", "fn": "whoosh", "gain": 0.5},
+    {"at": "shot2+0.0", "fn": "whisper_bed", "kw": {"dur": 9.0}, "gain": 0.5},
+    {"at": "shot4+0.0", "fn": "impact", "kw": {"dur": 2.6}, "gain": 1.0},
+    {"at": "shot4+0.05", "fn": "braam", "kw": {"dur": 2.8, "f": 55}, "gain": 0.9},
+    {"at": "shot5+0.2", "fn": "braam", "kw": {"dur": 3.0, "f": 55}, "gain": 1.0},
+    {"at": "shot6+0.0", "fn": "impact", "kw": {"dur": 2.4}, "gain": 0.9}
+  ],
+  "subtitles": {
+    "noks_01.mp3": "Нокс. Город, у которого нет неба. Двадцать миллионов человек. Три кольца. И один раз в год — Игры Тени.",
+    "noks_02.mp3": "Сто участников. Тридцать три сверху. Тридцать три из Индустрии. Тридцать три из Глубины. И один джокер. Случайный. Выбранный системой.",
+    "noks_03.mp3": "Мама слышала шёпот перед исчезновением. Папа — перед арестом. Теперь я. Это не безумие. Это Искра. Я записалась в Игры.",
+    "noks_04.mp3": "Шёпот начался за три дня до того, как мне исполнилось восемнадцать. И за четыре дня до того, как система выбрала меня джокером.",
+    "noks_05.mp3": "Мэйсон, если ты это читаешь — не ходи за мной. Ты захочешь, я знаю. Но они уже знают, кто ты. Только не дай им забрать твой голос."
+  }
+}

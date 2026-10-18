@@ -1,0 +1,5 @@
+# regenerable media caches / intermediates
+studio/assets/img/_4k/
+studio/assets/score/*_score.wav
+studio/assets/score/*_mix.wav
+__pycache__/

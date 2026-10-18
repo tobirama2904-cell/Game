@@ -1,0 +1,31 @@
+{
+  "id": "trailer_bone",
+  "grade": "bone",
+  "music": "bone",
+  "shots": [
+    {"kind": "img", "img": "bone_1.png", "zoom": [1.02, 1.20], "pan": [200, 30], "pad_in": 1.6, "pad_out": 1.1, "vo": ["bone_01.mp3"], "xfade": "fadeblack"},
+    {"kind": "img", "img": "bone_3.png", "zoom": [1.08, 1.02], "pan": [-260, 0], "pad_in": 0.8, "pad_out": 1.0, "vo": ["bone_02.mp3"], "xfade": "dissolve"},
+    {"kind": "img", "img": "bone_2.png", "zoom": [1.04, 1.24], "pan": [80, 0], "pad_in": 0.8, "pad_out": 1.0, "vo": ["bone_03.mp3"], "xfade": "fade"},
+    {"kind": "card", "card": "bone_whisper.png", "dur": 5.4, "xfade": "fadeblack"},
+    {"kind": "img", "img": "bone_4.png", "zoom": [1.0, 1.28], "pan": [0, 60], "pad_in": 0.9, "pad_out": 1.1, "min": 7.5, "xfade": "fade"},
+    {"kind": "img", "img": "bone_5.png", "zoom": [1.02, 1.40], "pan": [-80, -80], "shake": 40, "pad_in": 0.6, "pad_out": 1.3, "vo": ["bone_05.mp3"], "xfade": "fadewhite"},
+    {"kind": "card", "card": "bone_tag.png", "dur": 3.1, "xfade": "fadeblack"},
+    {"kind": "card", "card": "bone_title.png", "dur": 4.2, "xfade": "fade"},
+    {"kind": "card", "card": "end_bone.png", "dur": 3.4, "xfade": "fadeblack"}
+  ],
+  "sfx": [
+    {"at": 0.0, "fn": "sea_wash", "kw": {"dur": 8.0}, "gain": 0.7},
+    {"at": 0.0, "fn": "bell", "kw": {"f": 293.66, "dur": 5.0}, "gain": 0.5},
+    {"at": "shot3+0.4", "fn": "whisper_bed", "kw": {"dur": 10.0}, "gain": 0.5},
+    {"at": "shot4+0.0", "fn": "metal_scrape", "kw": {"dur": 1.8}, "gain": 0.6},
+    {"at": "shot5+0.0", "fn": "impact", "kw": {"dur": 2.6}, "gain": 1.0},
+    {"at": "shot5+0.3", "fn": "thunder", "kw": {"dur": 5.0}, "gain": 0.8},
+    {"at": "shot6+0.2", "fn": "impact", "kw": {"dur": 2.4}, "gain": 0.9}
+  ],
+  "subtitles": {
+    "bone_01.mp3": "Запах смерти был привычным. В Костяной Пристани никто не искал причины.",
+    "bone_02.mp3": "Тело оттаскивали выше линии прилива, где его забирали Проклятые. И к вечеру от человека оставалась только влажная тень на камнях.",
+    "bone_03.mp3": "Он не мог говорить. Слова здесь — роскошь. Четыре года он считал это проклятьем. Теперь — считал просто работой.",
+    "bone_05.mp3": "Память — дар Проклятых. Но он не был Проклятым. Он был ничем. Тихим грузчиком. И если бы кто-то узнал, что он чувствует чужие мысли…"
+  }
+}
