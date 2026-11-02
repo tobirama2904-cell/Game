@@ -1,0 +1,56 @@
+[gd_scene load_steps=5 format=3 uid="uid://griever"]
+
+[ext_resource type="Script" path="res://scripts/GrieverAI.gd" id="1_script"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+radius = 0.6
+height = 1.4
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_1"]
+radius = 0.6
+height = 1.4
+
+[sub_resource type="StandardMaterial3D" id="MatGriever"]
+albedo_color = Color(0.15, 0.1, 0.05, 1)
+metallic = 0.3
+roughness = 0.6
+emission_enabled = true
+emission = Color(1.0, 0.4, 0.05, 1)
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1"]
+_animations = [{"name":"idle","length":1.2,"loop":true,"tracks":[]},{"name":"walk","length":1.0,"loop":true,"tracks":[]},{"name":"run","length":0.7,"loop":true,"tracks":[]},{"name":"attack","length":1.0,"loop":false,"tracks":[]}]
+
+[node name="Griever" type="CharacterBody3D"]
+script = ExtResource("1_script")
+collision_layer = 3
+collision_mask = 2
+collision_priority = 2.0
+group = ["enemy"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_1")
+material_override = SubResource("MatGriever")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape_1")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+avoidance_enabled = true
+max_speed = 4.5
+max_acceleration = 10.0
+
+[node name="SightRayCast" type="RayCast3D" parent="."]
+enabled = true
+collision_mask = 2
+collision_mask = 2
+
+[node name="AttackArea" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Griever/AttackArea"]
+shape = SubResource("SphereShape_1")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("..")
+
+[sub_resource type="SphereShape3D" id="SphereShape_1"]
+radius = 1.5

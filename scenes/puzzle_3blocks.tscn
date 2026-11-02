@@ -1,0 +1,55 @@
+[gd_scene load_steps=4 format=3 uid="uid://puzzle3"]
+
+[sub_resource type="BoxMesh" id="CubeMesh"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="MatBlock"]
+albedo_color = Color(0.35, 0.3, 0.25, 1)
+roughness = 0.8
+
+[sub_resource type="BoxShape3D" id="CubeShape"]
+size = Vector3(1, 1, 1)
+
+[node name="Puzzle3Blocks" type="Node3D"]
+
+[node name="BlockA" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, 3)
+collision_layer = 2
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Puzzle3Blocks/BlockA"]
+mesh = SubResource("CubeMesh")
+material_override = SubResource("MatBlock")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Puzzle3Blocks/BlockA"]
+shape = SubResource("CubeShape")
+
+[node name="BlockB" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 3)
+collision_layer = 2
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Puzzle3Blocks/BlockB"]
+mesh = SubResource("CubeMesh")
+material_override = SubResource("MatBlock")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Puzzle3Blocks/BlockB"]
+shape = SubResource("CubeShape")
+
+[node name="BlockC" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 3)
+collision_layer = 2
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Puzzle3Blocks/BlockC"]
+mesh = SubResource("CubeMesh")
+material_override = SubResource("MatBlock")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Puzzle3Blocks/BlockC"]
+shape = SubResource("CubeShape")
+
+[node name="TriggerZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 3.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Puzzle3Blocks/TriggerZone"]
+shape = SubResource("BoxShape_2")
+
+[sub_resource type="BoxShape3D" id="BoxShape_2"]
+size = Vector3(4, 1, 2)

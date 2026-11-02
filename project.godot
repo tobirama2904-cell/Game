@@ -1,0 +1,54 @@
+; Engine Configuration File.
+; Godot version: 4.3-stable
+
+[application]
+config/name="MazeRunnerFanRemake"
+config/features=PackedStringArray("4.3", "Mobile")
+config/icon="res://assets/icon.svg"
+run/window_size/viewport_width=1280
+run/window_size/viewport_height=720
+
+[rendering]
+renderer/rendering_method="forward_plus"
+environment/default_clear_color=Color(0.05, 0.05, 0.08, 1)
+environment/default_environment="res://assets/default_env.tres"
+
+[rendering][vulkan]
+environment/use_vulkan_rendering=true
+
+[input]
+move_left=[{"deadzone": 0.5, "events": [{"keycode": 0, "scancode": 65, "device": -1}]}]
+move_right=[{"deadzone": 0.5, "events": [{"keycode": 0, "scancode": 68, "device": -1}]}]
+move_forward=[{"deadzone": 0.5, "events": [{"keycode": 0, "scancode": 87, "device": -1}]}]
+move_back=[{"deadzone": 0.5, "events": [{"keycode": 0, "scancode": 83, "device": -1}]}]
+jump=[{"deadzone": 0.5, "events": [{"keycode": 0, "scancode": 32, "device": -1}]}]
+interact=[{"deadzone": 0.5, "events": [{"keycode": 0, "scancode": 69, "device": -1}]}]
+pause=[{"deadzone": 0.5, "events": [{"keycode": 0, "scancode": 27, "device": -1}]}]
+
+[layer_names]
+2d_physics/layer_1="world"
+2d_physics/layer_2="player"
+2d_physics/layer_3="enemy"
+3d_physics/layer_1="world"
+3d_physics/layer_2="player"
+3d_physics/layer_3="enemy"
+
+[application][android]
+package/name="com.mazerunner.fan"
+package/unique_name="com.mazerunner.fan"
+custom_template/debug="org.godotengine.godot.GooglePlayBillingClient"
+custom_template/release="org.godotengine.godot.GooglePlayBillingClient"
+modules=["os.android", "org.godotengine.godot.GooglePlayBillingClient"]
+
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[physics]
+common/physics_ticks_per_second=60
+
+[editor]
+version_control/plugin_name="GitPlugin"
+version_control/autoload_on_startup=false

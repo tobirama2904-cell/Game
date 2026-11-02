@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://intro-cut"]
+
+[ext_resource type="Script" path="res://scripts/CutsceneController.gd" id="1_script"]
+
+[node name="IntroCutscene" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+current = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 8)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="UI" type="Control" parent="."]
+anchors_preset = 15
+
+[node name="Label" type="Label" parent="IntroCutscene/UI"]
+text = "Вы просыпаетесь в Глейде. Чак находит вас..."
+layout_mode = 2
+anchors_preset = 15
+vertical_alignment = 2
+horizontal_alignment = 1
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]
+stream = preload("res://assets/sounds/ambient_glade.ogg")

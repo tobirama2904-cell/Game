@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://hud-mt"]
+
+[node name="HUD_Multitouch" type="Control"]
+anchors_preset = 15
+
+[node name="JumpButton" type="TouchScreenButton" parent="."]
+text = "ПРЫЖОК"
+position = Vector2(1100, 600)
+custom_minimum_size = Vector2(150, 150)
+
+[node name="InteractButton" type="TouchScreenButton" parent="."]
+text = "ВЗАИМОД"
+position = Vector2(950, 700)
+custom_minimum_size = Vector2(120, 120)
+
+[node name="Label_Controls" type="Label" parent="."]
+text = "Мультитач: тап удерживать для движения, кнопки справа — прыжок/взаимодействие"
+layout_mode = 2
+anchors_preset = 15
+modulate = Color(1, 1, 1, 0.8)
+
+
