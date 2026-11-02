@@ -1,0 +1,91 @@
+[gd_scene load_steps=3 format=3 uid="uid://maze01"]
+
+[sub_resource type="BoxMesh" id="BlockMesh"]
+size = Vector3(2, 3, 2)
+
+[sub_resource type="StandardMaterial3D" id="MatStone"]
+albedo_color = Color(0.35, 0.35, 0.4, 1)
+metallic = 0.1
+roughness = 0.8
+
+[sub_resource type="BoxShape3D" id="BlockShape"]
+size = Vector3(2, 3, 2)
+
+[node name="MazeZone01" type="Node3D"]
+
+# Entrance corridor
+[node name="Corridor_1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -4)
+
+[node name="Wall" type="StaticBody3D" parent="MazeZone01/Corridor_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, -4)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MazeZone01/Corridor_1/Wall"]
+shape = SubResource("BlockShape")
+
+[node name="Wall2" type="StaticBody3D" parent="MazeZone01/Corridor_1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, -4)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MazeZone01/Corridor_1/Wall2"]
+shape = SubResource("BlockShape")
+
+# Fork 1 (left)
+[node name="ForkLeft" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1.5, -2)
+
+[node name="Wall" type="StaticBody3D" parent="MazeZone01/ForkLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, -2)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MazeZone01/ForkLeft/Wall"]
+shape = SubResource("BlockShape")
+
+# Fork 2 (right)
+[node name="ForkRight" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, -2)
+
+[node name="Wall" type="StaticBody3D" parent="MazeZone01/ForkRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, -2)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MazeZone01/ForkRight/Wall"]
+shape = SubResource("BlockShape")
+
+# Dead-end with hint (tupik with hint)
+[node name="DeadEnd" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 2)
+
+[node name="WallBack" type="StaticBody3D" parent="MazeZone01/DeadEnd"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 3)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MazeZone01/DeadEnd/WallBack"]
+shape = SubResource("BlockShape")
+
+[node name="HintCard" type="MeshInstance3D" parent="MazeZone01/DeadEnd"]
+mesh = SubResource("BlockMesh")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 2.5)
+material_override = SubResource("MatStone")
+
+# Returning corridor
+[node name="ReturnPath" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="WallBack" type="StaticBody3D" parent="MazeZone01/ReturnPath"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MazeZone01/ReturnPath/WallBack"]
+shape = SubResource("BlockShape")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="NavigationMeshInstance" type="NavigationMeshInstance" parent="MazeZone01/NavigationRegion3D"]
+mesh = SubResource("NavigationMesh")
+
+[sub_resource type="NavigationMesh" id="NavigationMesh"]
+
+[node name="MovingSection" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, -1)
+
+[node name="WallMove" type="StaticBody3D" parent="MazeZone01/MovingSection"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, -1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MazeZone01/MovingSection/WallMove"]
+shape = SubResource("BlockShape")

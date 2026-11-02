@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=3 uid="uid://b5k8p9p9r8l7k"]
+
+[ext_resource type="Script" path="res://scripts/PlayerController.gd" id="1_abc"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1"]
+_animations = [{"name":"idle","length":1.0,"loop":true,"tracks":[]},{"name":"run","length":0.8,"loop":true,"tracks":[]},{"name":"jump","length":0.6,"loop":false,"tracks":[]}]
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_abc")
+collision_layer = 2
+collision_mask = 3
+collision_priority = 1.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 3.5, 5.0)
+current = true
+environment = NodePath("../../WorldEnvironment")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("..")
+
+[node name="RayCast3D" type="RayCast3D" parent="."]
+cast_to = Vector3(0, 0, 2)
+enabled = true
+collision_mask = 1

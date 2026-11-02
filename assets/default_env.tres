@@ -1,0 +1,31 @@
+[gd_resource type="Environment" format=3 uid="uid://env-default"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_abc"]
+sky_top_color = Color(0.03, 0.05, 0.1, 1)
+sky_horizon_color = Color(0.05, 0.08, 0.15, 1)
+
+[sub_resource type="EnvironmentLighting" id="EnvironmentLighting_abc"]
+environment_mode = 1
+ambient_light_color = Color(0.2, 0.2, 0.25, 1)
+ambient_light_energy = 0.5
+
+[sub_resource type="EnvironmentGlow" id="EnvironmentGlow_abc"]
+enabled = true
+intensity = 0.4
+
+[sub_resource type="EnvironmentFog" id="EnvironmentFog_abc"]
+enabled = true
+density = 0.01
+color = Color(0.05, 0.06, 0.08, 1)
+
+[sub_resource type="EnvironmentSDFGI" id="EnvironmentSDFGI_abc"]
+enabled = true
+cascades = 4
+
+[resource]
+background_mode = 2
+background_sky = SubResource("ProceduralSkyMaterial_abc")
+ambient_light = SubResource("EnvironmentLighting_abc")
+glow = SubResource("EnvironmentGlow_abc")
+fog = SubResource("EnvironmentFog_abc")
+sdfgi = SubResource("EnvironmentSDFGI_abc")
